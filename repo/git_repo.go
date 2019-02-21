@@ -67,7 +67,19 @@ func (r gitRepo) Status() (git.Status, error) {
 		return nil, err
 	}
 
-	return s, nil
+	// Filter untracked files
+	ts := make(git.Status)
+
+	for path, fs := range s {
+		if !s.IsUntracked(path) {
+			tfs := ts.File(path)
+			tfs.Worktree = fs.Worktree
+			tfs.Extra = fs.Extra
+			tfs.Staging = fs.Staging
+		}
+	}
+
+	return ts, nil
 
 }
 
