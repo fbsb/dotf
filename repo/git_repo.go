@@ -89,7 +89,7 @@ func (r gitRepo) Worktree() (*git.Worktree, error) {
 		return nil, err
 	}
 
-	w.Excludes = append(w.Excludes, gitignore.ParsePattern(filepath.Join("./", DOTFILES, "/*"), nil))
+	w.Excludes = append(w.Excludes, gitignore.ParsePattern(filepath.Join("./", DOTFILES), nil))
 
 	return w, nil
 }
