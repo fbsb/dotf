@@ -9,6 +9,7 @@ import (
 	"gopkg.in/src-d/go-billy.v4/osfs"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/cache"
+	"gopkg.in/src-d/go-git.v4/plumbing/format/gitignore"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/storage"
 	"gopkg.in/src-d/go-git.v4/storage/filesystem"
@@ -21,7 +22,7 @@ type gitRepo struct {
 }
 
 func (r gitRepo) Add(path string) error {
-	w, err := r.g.Worktree()
+	w, err := r.Worktree()
 	if err != nil {
 		return err
 	}
@@ -35,7 +36,7 @@ func (r gitRepo) Add(path string) error {
 }
 
 func (r gitRepo) Commit(message, name, email string) error {
-	w, err := r.g.Worktree()
+	w, err := r.Worktree()
 	if err != nil {
 		return err
 	}
@@ -56,7 +57,7 @@ func (r gitRepo) Commit(message, name, email string) error {
 }
 
 func (r gitRepo) Status() (git.Status, error) {
-	w, err := r.g.Worktree()
+	w, err := r.Worktree()
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +69,17 @@ func (r gitRepo) Status() (git.Status, error) {
 
 	return s, nil
 
+}
+
+func (r gitRepo) Worktree() (*git.Worktree, error) {
+	w, err := r.g.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	w.Excludes = append(w.Excludes, gitignore.ParsePattern(filepath.Join("./", DOTFILES, "/*"), nil))
+
+	return w, nil
 }
 
 func Init(path string) (Repository, error) {
