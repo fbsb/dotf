@@ -9,3 +9,5 @@ require (
 	gopkg.in/src-d/go-billy.v4 v4.3.0
 	gopkg.in/src-d/go-git.v4 v4.10.0
 )
+
+replace gopkg.in/src-d/go-git.v4 v4.10.0 => github.com/fbsb/go-git v0.0.0-20190221153245-2ecc89d37110
