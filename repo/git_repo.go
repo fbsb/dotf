@@ -10,6 +10,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/cache"
 	"gopkg.in/src-d/go-git.v4/plumbing/format/gitignore"
+	"gopkg.in/src-d/go-git.v4/plumbing/format/index"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/storage"
 	"gopkg.in/src-d/go-git.v4/storage/filesystem"
@@ -30,6 +31,59 @@ func (r gitRepo) Add(path string) error {
 	_, err = w.Add(path)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (r gitRepo) Remove(path string) error {
+	w, err := r.Worktree()
+	if err != nil {
+		return err
+	}
+
+	idx, err := r.g.Storer.Index()
+	if err != nil {
+		return err
+	}
+
+	err = r.doRemoveRecursively(w, idx, path)
+	if err != nil {
+		return err
+	}
+
+	return r.g.Storer.SetIndex(idx)
+}
+
+func (r gitRepo) doRemoveRecursively(w *git.Worktree, idx *index.Index, path string) error {
+
+	fi, err := w.Filesystem.Lstat(path)
+	if err != nil {
+		return err
+	}
+
+	if !fi.IsDir() {
+		_, err = idx.Remove(path)
+		return err
+	}
+
+	files, err := w.Filesystem.ReadDir(path)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		name := filepath.Join(path, file.Name())
+
+		if file.IsDir() {
+			err = r.doRemoveRecursively(w, idx, name)
+		} else {
+			_, err = idx.Remove(name)
+		}
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
