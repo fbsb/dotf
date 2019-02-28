@@ -22,6 +22,8 @@ type gitRepo struct {
 	g *git.Repository
 }
 
+var _ Repository = &gitRepo{}
+
 func (r gitRepo) Add(path string) error {
 	w, err := r.Worktree()
 	if err != nil {
@@ -110,7 +112,7 @@ func (r gitRepo) Commit(message, name, email string) error {
 	return nil
 }
 
-func (r gitRepo) Status() (git.Status, error) {
+func (r gitRepo) Status() (Status, error) {
 	w, err := r.Worktree()
 	if err != nil {
 		return nil, err
@@ -122,15 +124,11 @@ func (r gitRepo) Status() (git.Status, error) {
 	}
 
 	// Filter untracked files
-	ts := make(git.Status)
+	ts := make(repoStatus)
 
+	// Convert git statuses to repo statuses
 	for path, fs := range s {
-		if !s.IsUntracked(path) {
-			tfs := ts.File(path)
-			tfs.Worktree = fs.Worktree
-			tfs.Extra = fs.Extra
-			tfs.Staging = fs.Staging
-		}
+		ts.add(path, *fs)
 	}
 
 	return ts, nil
