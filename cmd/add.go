@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/fbsb/dotf/repo"
+	"github.com/fbsb/dotf/repo/git"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var addCmd = &cobra.Command{
 	Short: "Add a file to the repository and track changes made to it.",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		r, err := repo.Open(rootPath)
+		r, err := git.Open(rootPath)
 		if err != nil {
 			return err
 		}

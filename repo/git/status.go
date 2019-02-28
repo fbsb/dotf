@@ -1,20 +1,21 @@
-package repo
+package git
 
 import (
 	"bytes"
 
 	"fmt"
 
+	"github.com/fbsb/dotf/repo"
 	"gopkg.in/src-d/go-git.v4"
 )
 
 // The repoStatus map ignores untracked or unmodified files
-type repoStatus map[string]FileStatus
+type repoStatus map[string]repo.FileStatus
 
-func (s repoStatus) File(path string) FileStatus {
+func (s repoStatus) File(path string) repo.FileStatus {
 	fs, ok := s[path]
 	if !ok {
-		return StatusUnchanged
+		return repo.StatusUnchanged
 	}
 	return fs
 }
@@ -47,24 +48,24 @@ func (s *repoStatus) add(path string, gs git.FileStatus) {
 	(*s)[path] = convertGitStatus(gs)
 }
 
-func convertGitStatus(s git.FileStatus) FileStatus {
+func convertGitStatus(s git.FileStatus) repo.FileStatus {
 	// TODO(fbsb): deal with Renamed, Copied and UpdatedButUnmerged edge cases
 
 	switch s.Staging {
 	case git.Added:
-		return StatusAdded
+		return repo.StatusAdded
 	case git.Deleted:
-		return StatusRemoved
+		return repo.StatusRemoved
 	case git.Modified:
-		return StatusModified
+		return repo.StatusModified
 	}
 
 	switch s.Worktree {
 	case git.Deleted:
-		return StatusRemoved
+		return repo.StatusRemoved
 	case git.Modified:
-		return StatusModified
+		return repo.StatusModified
 	}
 
-	return StatusUnchanged
+	return repo.StatusUnchanged
 }
