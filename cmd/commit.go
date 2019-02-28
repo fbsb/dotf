@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	"github.com/fbsb/dotf/repo"
+	"github.com/fbsb/dotf/repo/git"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +32,7 @@ var commitCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		r, err := repo.Open(rootPath)
+		r, err := git.Open(rootPath)
 		if err != nil {
 			return err
 		}

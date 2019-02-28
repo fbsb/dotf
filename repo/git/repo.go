@@ -1,10 +1,11 @@
-package repo
+package git
 
 import (
 	"path/filepath"
 
 	"time"
 
+	"github.com/fbsb/dotf/repo"
 	"gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-billy.v4/osfs"
 	"gopkg.in/src-d/go-git.v4"
@@ -22,7 +23,7 @@ type gitRepo struct {
 	g *git.Repository
 }
 
-var _ Repository = &gitRepo{}
+var _ repo.Repository = &gitRepo{}
 
 func (r gitRepo) Add(path string) error {
 	w, err := r.Worktree()
@@ -112,7 +113,7 @@ func (r gitRepo) Commit(message, name, email string) error {
 	return nil
 }
 
-func (r gitRepo) Status() (Status, error) {
+func (r gitRepo) Status() (repo.Status, error) {
 	w, err := r.Worktree()
 	if err != nil {
 		return nil, err
@@ -123,7 +124,6 @@ func (r gitRepo) Status() (Status, error) {
 		return nil, err
 	}
 
-	// Filter untracked files
 	ts := make(repoStatus)
 
 	// Convert git statuses to repo statuses
@@ -146,7 +146,7 @@ func (r gitRepo) Worktree() (*git.Worktree, error) {
 	return w, nil
 }
 
-func Init(path string) (Repository, error) {
+func Init(path string) (repo.Repository, error) {
 	s, err := newStorage(path)
 	if err != nil {
 		return nil, err
@@ -162,7 +162,7 @@ func Init(path string) (Repository, error) {
 	return &gitRepo{g}, nil
 }
 
-func Open(path string) (Repository, error) {
+func Open(path string) (repo.Repository, error) {
 	s, err := newStorage(path)
 	if err != nil {
 		return nil, err
