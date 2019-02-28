@@ -21,12 +21,13 @@ var statusCmd = &cobra.Command{
 			return err
 		}
 
-		if len(s) > 0 {
-			fmt.Println("Changed files:")
-			fmt.Println(s)
-		} else {
+		if s.IsClean() {
 			fmt.Println("No changes.")
+			return nil
 		}
+
+		fmt.Println("Changed files:")
+		fmt.Println(s)
 
 		return nil
 	},

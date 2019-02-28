@@ -1,4 +1,7 @@
-build:
+vendor:
+	go mod vendor
+
+build: vendor
 	docker build -t dotf .
 
 shell: build
